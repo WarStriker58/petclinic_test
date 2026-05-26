@@ -83,7 +83,7 @@ Cada integrante tiene asignado su propio bloque de pruebas. Cada bloque debe ir 
 
 ---
 
-### Grupo 4 — Pruebas para TypeService
+### Grupo 5 — Pruebas para TypeService
 
 **Integrante A — CRUD básico**
 - `testCreateType` — crear tipo.
@@ -104,7 +104,7 @@ Cada integrante tiene asignado su propio bloque de pruebas. Cada bloque debe ir 
 
 ## 👥 Escenarios para grupos de 4 integrantes
 
-### Grupo 5 — Pruebas para VisitService
+### Grupo 4 — Pruebas para VisitService
 
 **Integrante A — CRUD básico**
 - `testCreateVisit` — registrar una visita.
