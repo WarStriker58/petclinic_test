@@ -1,117 +1,96 @@
 package com.tecsup.petclinic.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
+import com.tecsup.petclinic.dtos.OwnerDTO;
 import com.tecsup.petclinic.exceptions.OwnerNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@ExtendWith(MockitoExtension.class)
-class OwnerServiceTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    @Mock
-    private OwnerRepository ownerRepository;
+@SpringBootTest
+@Slf4j
+public class OwnerServiceTest {
 
-    @InjectMocks
-    private OwnerService ownerService;
+	@Autowired
+	private OwnerService ownerService;
 
-    @Test
-    void testFindOwnerById_NotFound() {
-        // Given
-        Long ownerId = 999L;
-        when(ownerRepository.findById(ownerId)).thenReturn(Optional.empty());
+	@Test
+	public void testCreateOwner() {
+		OwnerDTO ownerDTO = OwnerDTO.builder()
+				.firstName("Calep")
+				.lastName("Neyra")
+				.address("Av. Principal 123")
+				.city("Lima")
+				.telephone("999888777")
+				.build();
 
-        // When
-        OwnerNotFoundException exception = assertThrows(
-                OwnerNotFoundException.class,
-                () -> ownerService.findOwnerById(ownerId)
-        );
+		OwnerDTO ownerCreated = ownerService.create(ownerDTO);
 
-        // Then
-        assertEquals(new OwnerNotFoundException().getMessage(), exception.getMessage());
-        verify(ownerRepository, times(1)).findById(ownerId);
-    }
+		log.info("Owner created: {}", ownerCreated);
 
-    @Test
-    void testDeleteOwner_NotFound() {
-        // Given
-        Long ownerId = 999L;
-        when(ownerRepository.existsById(ownerId)).thenReturn(false);
+		assertNotNull(ownerCreated);
+		assertNotNull(ownerCreated.getId());
+		assertEquals("Calep", ownerCreated.getFirstName());
+		assertEquals("Neyra", ownerCreated.getLastName());
+		assertEquals("Lima", ownerCreated.getCity());
+		assertEquals("999888777", ownerCreated.getTelephone());
+	}
 
-        // When
-        OwnerNotFoundException exception = assertThrows(
-                OwnerNotFoundException.class,
-                () -> ownerService.deleteOwner(ownerId)
-        );
+	@Test
+	public void testUpdateOwner() {
+		OwnerDTO ownerDTO = OwnerDTO.builder()
+				.firstName("Luis")
+				.lastName("Ramirez")
+				.address("Calle Antigua 111")
+				.city("Lima")
+				.telephone("111222333")
+				.build();
 
-        // Then
-        assertEquals(new OwnerNotFoundException().getMessage(), exception.getMessage());
-        verify(ownerRepository, times(1)).existsById(ownerId);
-    }
+		OwnerDTO ownerCreated = ownerService.create(ownerDTO);
 
-    @Test
-    void testFindByLastName_Empty() {
-        // Given
-        String lastName = "ApellidoInexistente";
-        when(ownerRepository.findByLastNameIgnoreCase(lastName)).thenReturn(List.of());
+		ownerCreated.setFirstName("Luis Actualizado");
+		ownerCreated.setLastName("Ramirez Actualizado");
+		ownerCreated.setAddress("Calle Nueva 222");
+		ownerCreated.setCity("Arequipa");
+		ownerCreated.setTelephone("444555666");
 
-        // When
-        List<Owner> owners = ownerService.findByLastName(lastName);
+		OwnerDTO ownerUpdated = ownerService.update(ownerCreated);
 
-        // Then
-        assertNotNull(owners);
-        assertTrue(owners.isEmpty());
-        verify(ownerRepository, times(1)).findByLastNameIgnoreCase(lastName);
-    }
+		log.info("Owner updated: {}", ownerUpdated);
 
-    interface OwnerRepository {
-        Optional<Owner> findById(Long id);
+		assertNotNull(ownerUpdated);
+		assertEquals(ownerCreated.getId(), ownerUpdated.getId());
+		assertEquals("Luis Actualizado", ownerUpdated.getFirstName());
+		assertEquals("Ramirez Actualizado", ownerUpdated.getLastName());
+		assertEquals("Calle Nueva 222", ownerUpdated.getAddress());
+		assertEquals("Arequipa", ownerUpdated.getCity());
+		assertEquals("444555666", ownerUpdated.getTelephone());
+	}
 
-        boolean existsById(Long id);
+	@Test
+	public void testDeleteOwner() {
+		OwnerDTO ownerDTO = OwnerDTO.builder()
+				.firstName("Pedro")
+				.lastName("Lopez")
+				.address("Av. Delete 555")
+				.city("Cusco")
+				.telephone("777888999")
+				.build();
 
-        void deleteById(Long id);
+		OwnerDTO ownerCreated = ownerService.create(ownerDTO);
 
-        List<Owner> findByLastNameIgnoreCase(String lastName);
-    }
+		assertNotNull(ownerCreated.getId());
 
-    static class OwnerService {
+		try {
+			ownerService.delete(ownerCreated.getId());
+		} catch (OwnerNotFoundException e) {
+			fail(e.getMessage());
+		}
 
-        private final OwnerRepository ownerRepository;
-
-        OwnerService(OwnerRepository ownerRepository) {
-            this.ownerRepository = ownerRepository;
-        }
-
-        Owner findOwnerById(Long id) {
-            return ownerRepository.findById(id).orElseThrow(OwnerNotFoundException::new);
-        }
-
-        void deleteOwner(Long id) {
-            if (!ownerRepository.existsById(id)) {
-                throw new OwnerNotFoundException();
-            }
-
-            ownerRepository.deleteById(id);
-        }
-
-        List<Owner> findByLastName(String lastName) {
-            return ownerRepository.findByLastNameIgnoreCase(lastName);
-        }
-    }
-
-    static class Owner {
-    }
+		assertThrows(OwnerNotFoundException.class, () -> {
+			ownerService.findById(ownerCreated.getId());
+		});
+	}
 }

@@ -1,65 +1,77 @@
 package com.tecsup.petclinic.services;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
+import com.tecsup.petclinic.dtos.OwnerDTO;
 import com.tecsup.petclinic.entities.Owner;
 import com.tecsup.petclinic.exceptions.OwnerNotFoundException;
 import com.tecsup.petclinic.repositories.OwnerRepository;
+import org.springframework.stereotype.Service;
 
-/**
- *
- * @author Calderon
- *
- */
 @Service
 public class OwnerServiceImpl implements OwnerService {
 
-	OwnerRepository ownerRepository;
+    private final OwnerRepository ownerRepository;
 
-	public OwnerServiceImpl(OwnerRepository ownerRepository) {
-		this.ownerRepository = ownerRepository;
-	}
+    public OwnerServiceImpl(OwnerRepository ownerRepository) {
+        this.ownerRepository = ownerRepository;
+    }
 
-	@Override
-	public Owner findById(Integer id) throws OwnerNotFoundException {
+    @Override
+    public OwnerDTO create(OwnerDTO ownerDTO) {
+        Owner owner = toEntity(ownerDTO);
+        Owner ownerSaved = ownerRepository.save(owner);
+        return toDTO(ownerSaved);
+    }
 
-		Optional<Owner> owner = ownerRepository.findById(id);
+    @Override
+    public OwnerDTO update(OwnerDTO ownerDTO) throws OwnerNotFoundException {
+        Owner owner = ownerRepository.findById(ownerDTO.getId())
+                .orElseThrow(() -> new OwnerNotFoundException("Owner not found with id: " + ownerDTO.getId()));
 
-		if (!owner.isPresent())
-			throw new OwnerNotFoundException("Record not found...!");
+        owner.setFirstName(ownerDTO.getFirstName());
+        owner.setLastName(ownerDTO.getLastName());
+        owner.setAddress(ownerDTO.getAddress());
+        owner.setCity(ownerDTO.getCity());
+        owner.setTelephone(ownerDTO.getTelephone());
 
-		return owner.get();
-	}
+        Owner ownerUpdated = ownerRepository.save(owner);
+        return toDTO(ownerUpdated);
+    }
 
-	@Override
-	public List<Owner> findByLastName(String lastName) {
+    @Override
+    public void delete(Integer id) throws OwnerNotFoundException {
+        Owner owner = ownerRepository.findById(id)
+                .orElseThrow(() -> new OwnerNotFoundException("Owner not found with id: " + id));
 
-		List<Owner> owners = ownerRepository.findByLastName(lastName);
+        ownerRepository.delete(owner);
+    }
 
-		return owners;
-	}
+    @Override
+    public OwnerDTO findById(Integer id) throws OwnerNotFoundException {
+        Owner owner = ownerRepository.findById(id)
+                .orElseThrow(() -> new OwnerNotFoundException("Owner not found with id: " + id));
 
-	@Override
-	public List<Owner> findByCity(String city) {
+        return toDTO(owner);
+    }
 
-		List<Owner> owners = ownerRepository.findByCity(city);
+    private OwnerDTO toDTO(Owner owner) {
+        return OwnerDTO.builder()
+                .id(owner.getId())
+                .firstName(owner.getFirstName())
+                .lastName(owner.getLastName())
+                .address(owner.getAddress())
+                .city(owner.getCity())
+                .telephone(owner.getTelephone())
+                .build();
+    }
 
-		return owners;
-	}
-
-	@Override
-	public Owner save(Owner owner) {
-		return ownerRepository.save(owner);
-	}
-
-	@Override
-	public void deleteById(Integer id) throws OwnerNotFoundException {
-
-		findById(id);
-
-		ownerRepository.deleteById(id);
-	}
+    private Owner toEntity(OwnerDTO ownerDTO) {
+        return Owner.builder()
+                .id(ownerDTO.getId())
+                .firstName(ownerDTO.getFirstName())
+                .lastName(ownerDTO.getLastName())
+                .address(ownerDTO.getAddress())
+                .city(ownerDTO.getCity())
+                .telephone(ownerDTO.getTelephone())
+                .build();
+    }
 }

@@ -1,17 +1,16 @@
 package com.tecsup.petclinic.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "owners")
-@Getter
-@Setter
-@NoArgsConstructor
+@Table(name = "vets")
+@Data
 @AllArgsConstructor
-@Builder
-@ToString
-public class Owner {
+@NoArgsConstructor
+public class Vet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +22,9 @@ public class Owner {
     @Column(name = "last_name")
     private String lastName;
 
-    private String address;
+    private String email;
 
-    private String city;
+    private String phone;
 
-    private String telephone;
+    private Boolean active;
 }

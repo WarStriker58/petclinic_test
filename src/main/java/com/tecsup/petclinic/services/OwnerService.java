@@ -1,24 +1,15 @@
 package com.tecsup.petclinic.services;
 
-import java.util.List;
-
-import com.tecsup.petclinic.entities.Owner;
+import com.tecsup.petclinic.dtos.OwnerDTO;
 import com.tecsup.petclinic.exceptions.OwnerNotFoundException;
 
-/**
- *
- * @author Calderon
- *
- */
 public interface OwnerService {
 
-	Owner findById(Integer id) throws OwnerNotFoundException;
+    OwnerDTO create(OwnerDTO ownerDTO);
 
-	List<Owner> findByLastName(String lastName);
+    OwnerDTO update(OwnerDTO ownerDTO) throws OwnerNotFoundException;
 
-	List<Owner> findByCity(String city);
+    void delete(Integer id) throws OwnerNotFoundException;
 
-	Owner save(Owner owner);
-
-	void deleteById(Integer id) throws OwnerNotFoundException;
+    OwnerDTO findById(Integer id) throws OwnerNotFoundException;
 }
