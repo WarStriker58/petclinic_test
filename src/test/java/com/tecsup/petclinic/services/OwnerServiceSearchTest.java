@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import com.tecsup.petclinic.dtos.OwnerDTO;
 import com.tecsup.petclinic.entities.Owner;
 import com.tecsup.petclinic.repositories.OwnerRepository;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class OwnerServiceSearchTest {
 
 		when(ownerRepository.findById(1)).thenReturn(Optional.of(ownerExpected));
 
-		Owner owner = ownerService.findById(1);
+		OwnerDTO owner = ownerService.findById(1);
 
 		assertNotNull(owner);
 		assertEquals(1, owner.getId());
@@ -61,7 +62,7 @@ public class OwnerServiceSearchTest {
 
 		when(ownerRepository.findByLastName("Franklin")).thenReturn(List.of(ownerExpected));
 
-		List<Owner> owners = ownerService.findByLastName("Franklin");
+		List<OwnerDTO> owners = ownerService.findByLastName("Franklin");
 
 		assertNotNull(owners);
 		assertEquals(1, owners.size());
@@ -82,7 +83,7 @@ public class OwnerServiceSearchTest {
 
 		when(ownerRepository.findByCity("Madison")).thenReturn(List.of(ownerExpected));
 
-		List<Owner> owners = ownerService.findByCity("Madison");
+		List<OwnerDTO> owners = ownerService.findByCity("Madison");
 
 		assertNotNull(owners);
 		assertEquals(1, owners.size());

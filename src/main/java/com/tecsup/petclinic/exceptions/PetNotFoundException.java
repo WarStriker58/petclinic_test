@@ -14,9 +14,5 @@ public class PetNotFoundException extends Exception {
 
 	public PetNotFoundException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
-
-	
-	
 }

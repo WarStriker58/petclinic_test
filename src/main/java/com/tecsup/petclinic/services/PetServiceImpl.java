@@ -46,11 +46,14 @@ public class PetServiceImpl implements PetService {
 	 * @return
 	 */
 	@Override
-	public PetDTO update(PetDTO petDTO) {
+	public PetDTO update(PetDTO petDTO) throws PetNotFoundException {
+		if (petDTO.getId() == null || !petRepository.existsById(petDTO.getId())) {
+			throw new PetNotFoundException("Pet not found with id: " + petDTO.getId());
+		}
 
-		Pet newPet = petRepository.save(petMapper.mapToEntity(petDTO));
+		Pet petUpdated = petRepository.save(petMapper.mapToEntity(petDTO));
 
-		return petMapper.mapToDto(newPet);
+		return petMapper.mapToDto(petUpdated);
 
 	}
 
@@ -109,13 +112,16 @@ public class PetServiceImpl implements PetService {
 	 * @return
 	 */
 	@Override
-	public List<Pet> findByTypeId(int typeId) {
+	public List<PetDTO> findByTypeId(int typeId) {
 
 		List<Pet> pets = petRepository.findByTypeId(typeId);
 
 		pets.forEach(pet -> log.info("{}", pet));
 
-		return pets;
+		return pets
+				.stream()
+				.map(this.petMapper::mapToDto)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -124,13 +130,16 @@ public class PetServiceImpl implements PetService {
 	 * @return
 	 */
 	@Override
-	public List<Pet> findByOwnerId(int ownerId) {
+	public List<PetDTO> findByOwnerId(int ownerId) {
 
 		List<Pet> pets = petRepository.findByOwnerId(ownerId);
 
 		pets.forEach(pet -> log.info("{}", pet));
 
-		return pets;
+		return pets
+				.stream()
+				.map(this.petMapper::mapToDto)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -138,9 +147,11 @@ public class PetServiceImpl implements PetService {
 	 * @return
 	 */
 	@Override
-	public List<Pet> findAll() {
-		//
-		return petRepository.findAll();
+	public List<PetDTO> findAll() {
+		return petRepository.findAll()
+				.stream()
+				.map(this.petMapper::mapToDto)
+				.collect(Collectors.toList());
 
 	}
 }

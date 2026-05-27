@@ -6,6 +6,8 @@ import com.tecsup.petclinic.exceptions.OwnerNotFoundException;
 import com.tecsup.petclinic.repositories.OwnerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OwnerServiceImpl implements OwnerService {
 
@@ -51,6 +53,22 @@ public class OwnerServiceImpl implements OwnerService {
                 .orElseThrow(() -> new OwnerNotFoundException("Owner not found with id: " + id));
 
         return toDTO(owner);
+    }
+
+    @Override
+    public List<OwnerDTO> findByLastName(String lastName) {
+        return ownerRepository.findByLastName(lastName)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Override
+    public List<OwnerDTO> findByCity(String city) {
+        return ownerRepository.findByCity(city)
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     private OwnerDTO toDTO(Owner owner) {

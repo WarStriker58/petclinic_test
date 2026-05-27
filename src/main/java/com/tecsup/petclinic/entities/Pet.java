@@ -13,7 +13,8 @@ import java.time.LocalDate;
  * @author jgomezm
  *
  */
-@Entity(name = "pets")
+@Entity
+@Table(name = "pets")
 @NoArgsConstructor
 @Data
 @AllArgsConstructor

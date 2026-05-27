@@ -1,7 +1,6 @@
 package com.tecsup.petclinic.services;
 
 import com.tecsup.petclinic.dtos.PetDTO;
-import com.tecsup.petclinic.entities.Pet;
 import com.tecsup.petclinic.exceptions.PetNotFoundException;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public interface PetService {
 	 * @param pet
 	 * @return
 	 */
-	PetDTO update(PetDTO pet);
+	PetDTO update(PetDTO pet) throws PetNotFoundException;
 
 	/**
 	 * 
@@ -53,18 +52,18 @@ public interface PetService {
 	 * @param typeId
 	 * @return
 	 */
-	List<Pet> findByTypeId(int typeId);
+	List<PetDTO> findByTypeId(int typeId);
 
 	/**
 	 * 
 	 * @param ownerId
 	 * @return
 	 */
-	List<Pet> findByOwnerId(int ownerId);
+	List<PetDTO> findByOwnerId(int ownerId);
 
 	/**
 	 *
 	 * @return
 	 */
-	List<Pet> findAll();
+	List<PetDTO> findAll();
 }

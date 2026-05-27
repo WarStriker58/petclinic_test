@@ -96,7 +96,7 @@ public class PetServiceMockitoTest {
         Mockito.when(this.repository.findByTypeId(TYPE_ID))
                 .thenReturn(petsExpected);
 
-        List<Pet> pets = this.petService.findByTypeId(TYPE_ID);
+        List<PetDTO> pets = this.petService.findByTypeId(TYPE_ID);
 
         assertEquals(petsExpected.size(), pets.size());
     }
@@ -114,7 +114,7 @@ public class PetServiceMockitoTest {
         Mockito.when(this.repository.findByOwnerId(OWNER_ID))
                 .thenReturn(petsExpected);
 
-        List<Pet> pets = this.petService.findByOwnerId(OWNER_ID);
+        List<PetDTO> pets = this.petService.findByOwnerId(OWNER_ID);
 
         assertEquals(petsExpected.size(), pets.size());
 
@@ -188,17 +188,24 @@ public class PetServiceMockitoTest {
         Pet newPetUpdate = this.petMapper.mapToEntity(newPetDTOUpdate);
 
         // Create
+        Mockito.when(this.repository.existsById(newPetDTOUpdate.getId()))
+                .thenReturn(true);
         Mockito.when(this.repository.save(newPetUpdate))
                 .thenReturn(newPetUpdate);
 
         // Execute update
-        PetDTO petDTOUpdate = this.petService.update(newPetDTOCreate);
+        PetDTO petDTOUpdate = null;
+        try {
+            petDTOUpdate = this.petService.update(newPetDTOCreate);
+        } catch (PetNotFoundException e) {
+            fail(e.getMessage());
+        }
         log.info("{}" + petDTOUpdate);
 
         //            EXPECTED           ACTUAL
         assertEquals(UP_PET_NAME, petDTOUpdate.getName());
-        assertEquals(UP_OWNER_ID, petDTOUpdate.getTypeId());
-        assertEquals(UP_TYPE_ID, petDTOUpdate.getOwnerId());
+        assertEquals(UP_OWNER_ID, petDTOUpdate.getOwnerId());
+        assertEquals(UP_TYPE_ID, petDTOUpdate.getTypeId());
     }
 
     /**

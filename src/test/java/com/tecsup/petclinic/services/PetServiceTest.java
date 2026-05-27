@@ -59,7 +59,7 @@ public class PetServiceTest {
         int TYPE_ID = 5;
         int SIZE_EXPECTED = 2;
 
-        List<Pet> pets = this.petService.findByTypeId(TYPE_ID);
+        List<PetDTO> pets = this.petService.findByTypeId(TYPE_ID);
 
         assertEquals(SIZE_EXPECTED, pets.size());
     }
@@ -73,7 +73,7 @@ public class PetServiceTest {
         int OWNER_ID = 10;
         int SIZE_EXPECTED = 2;
 
-        List<Pet> pets = this.petService.findByOwnerId(OWNER_ID);
+        List<PetDTO> pets = this.petService.findByOwnerId(OWNER_ID);
 
         assertEquals(SIZE_EXPECTED, pets.size());
 
@@ -142,13 +142,18 @@ public class PetServiceTest {
         petDTOCreated.setTypeId(UP_TYPE_ID);
 
         // Execute update
-        PetDTO upgradePetDTO = this.petService.update(petDTOCreated);
+        PetDTO upgradePetDTO = null;
+        try {
+            upgradePetDTO = this.petService.update(petDTOCreated);
+        } catch (PetNotFoundException e) {
+            fail(e.getMessage());
+        }
         log.info(">>>>" + upgradePetDTO);
 
         //            EXPECTED        ACTUAL
         assertEquals(UP_PET_NAME, upgradePetDTO.getName());
-        assertEquals(UP_OWNER_ID, upgradePetDTO.getTypeId());
-        assertEquals(UP_TYPE_ID, upgradePetDTO.getOwnerId());
+        assertEquals(UP_OWNER_ID, upgradePetDTO.getOwnerId());
+        assertEquals(UP_TYPE_ID, upgradePetDTO.getTypeId());
     }
 
     /**
